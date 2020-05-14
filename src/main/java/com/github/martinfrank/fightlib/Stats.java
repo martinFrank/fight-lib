@@ -1,4 +1,5 @@
 package com.github.martinfrank.fightlib;
 
-public class Defense {
+public class Stats {
+
 }
