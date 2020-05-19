@@ -23,6 +23,16 @@ public class TestEntity implements Entity {
     }
 
     @Override
+    public Damage getDamage(Entity defender) {
+        return new TestDamage();
+    }
+
+    @Override
+    public void applyDamage(Damage damage) {
+
+    }
+
+    @Override
     public String toString() {
         return name;
     }

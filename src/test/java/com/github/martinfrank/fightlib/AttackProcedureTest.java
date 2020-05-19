@@ -4,16 +4,16 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class AttackTest {
+public class AttackProcedureTest {
 
     @Test
-    public void testRound() {
+    public void testAttackProcedureExecution() {
         //given
         Entity attacker = new TestEntity("attacker", new WinningChance(), new WinningChance());
         Entity defender = new TestEntity("defender", new FailingChance(), new FailingChance());
 
         //when
-        Attack attack = new Attack(attacker, defender);
+        AttackProcedure attack = new AttackProcedure(attacker, defender);
         Result result = attack.execute();
         result.entries().forEach(System.out::println);
 
