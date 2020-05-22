@@ -2,7 +2,6 @@ package com.github.martinfrank.fightlib;
 
 public interface Entity {
 
-    Chance getAttackChance(Entity defender);
+    Stats getStats();
 
-    Chance getDefendChance(Entity attacker);
 }
