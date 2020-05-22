@@ -1,6 +1,6 @@
 package com.github.martinfrank.fightlib;
 
-public enum StatIdentifier {
+public enum TestStatIdentifier {
 
     HEALTH, INTELLIGENCE, STRENGTH
 }

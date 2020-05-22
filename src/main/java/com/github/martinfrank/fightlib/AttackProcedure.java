@@ -1,62 +1,70 @@
 package com.github.martinfrank.fightlib;
 
-public class AttackProcedure {
+import java.util.List;
 
-    private final Entity attacker;
-    private final Entity defender;
-    private final Chance attackChance;
-    private final Chance defendChance;
-    private final Result result;
+public class AttackProcedure extends BaseRuleAccess {
 
-    public AttackProcedure(Entity attacker, Entity defender) {
-        this.attacker = attacker;
-        this.defender = defender;
-
-        attackChance = attacker.getAttackChance(defender);
-        defendChance = defender.getDefendChance(attacker);
-
-        result = new Result();
+    public AttackProcedure(RuleBook rules) {
+        super(rules);
     }
 
-    public Result execute() {
-        result.append("attack begins");
-        result.append(attacker + " attacks " + defender);
-        result.append("--------");
-        result.append("");
+    private static void logDefendChance(Result log, Chance defendChance) {
+        log.append("chance of successful block the attack is: " + defendChance);
+        log.append("defender rolled: " + defendChance.getRollResult() + ", defense was successful=" + defendChance.wasSuccessful());
+        log.append("");
+    }
 
-        result.append("chance of successful attack is: " + attackChance);
-        attackChance.roll();
-        boolean attackRollSuccess = attackChance.wasSuccessful();
-        result.append("attacker rolled: " + attackChance.getRollResult() + ", attack was successful=" + attackRollSuccess);
-        result.append("");
+    private static void logOutro(Result log) {
+        log.append("");
+        log.append("attack is done");
+        log.append("--------");
+        log.append("");
+    }
 
-        if (attackRollSuccess) {
-            result.append("chance of successful block the attack is: " + defendChance);
-            defendChance.roll();
-            boolean defendRollSuccess = defendChance.wasSuccessful();
-            result.append("defender rolled: " + defendChance.getRollResult() + ", defense was successful=" + defendRollSuccess);
-            result.append("");
-            if (defendRollSuccess) {
-                result.append("defender successfully blocked the attack");
+    private static void logAttackChance(Result log, Chance attackChance) {
+        log.append("chance of successful attack is: " + attackChance);
+        log.append("attacker rolled: " + attackChance.getRollResult() + ", attack was successful=" + attackChance.wasSuccessful());
+        log.append("");
+    }
+
+    private static void logIntro(Result log, Entity attacker, Entity defender) {
+        log.append("attack begins");
+        log.append(attacker + " attacks " + defender);
+        log.append("--------");
+        log.append("");
+    }
+
+    public Result performAttack(Entity attacker, Entity defender) {
+        Result log = new Result();
+        logIntro(log, attacker, defender);
+
+        Chance attackChance = getRules().getAttackChance(attacker, defender);
+        Chance defendChance = getRules().getDefendChance(attacker, defender);
+
+        logAttackChance(log, attackChance);
+
+        if (attackChance.wasSuccessful()) {
+            log.append("attack was successful (attacker hit)");
+            logDefendChance(log, defendChance);
+            if (defendChance.wasSuccessful()) {
+                log.append("defender successfully blocked the attack");
             } else {
-                result.append("defender could not block the attack - time to take some damage....");
-                applyDamage(attacker, defender, attackChance, defendChance);
+                log.append("defender could not block the attack - time to take some damage....");
+                applyDamage(attacker, defender, attackChance, defendChance, log);
             }
         } else {
-            result.append("attack was not successful");
+            log.append("attack was not successful (attacker missed)");
         }
 
-        result.append("");
-        result.append("attack is done");
-        result.append("--------");
-        result.append("");
+        logOutro(log);
 
-        return result;
+        return log;
     }
 
-    private void applyDamage(Entity attacker, Entity defender, Chance attackChance, Chance defendChance) {
-        Damage damage = attacker.getDamage(defender);
-        damage.applyChanceModifier(attackChance, defendChance);
-        defender.applyDamage(damage);
+    private void applyDamage(Entity attacker, Entity defender, Chance attackChance, Chance defendChance, Result log) {
+        List<StatChange> impact = getRules().getImpact(attacker, defender, attackChance, defendChance);
+        log.append("giving impact: " + impact);
+        defender.getStats().changeStats(impact);
     }
+
 }

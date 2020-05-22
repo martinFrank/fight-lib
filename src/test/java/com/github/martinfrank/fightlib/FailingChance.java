@@ -4,16 +4,10 @@ import java.util.Random;
 
 public class FailingChance implements Chance {
 
-    private final Random random = new Random();
-    private int die;
-    private boolean rolled = false;
+    private final int die;
 
-    @Override
-    public void roll() {
-        if (!rolled) {
-            die = 1 + random.nextInt(20);
-            rolled = true;
-        }
+    public FailingChance() {
+        die = 1 + new Random().nextInt(20);
     }
 
     @Override
