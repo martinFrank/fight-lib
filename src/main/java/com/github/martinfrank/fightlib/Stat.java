@@ -25,7 +25,9 @@ public class Stat {
         return current;
     }
 
-
-    public enum Scope {BASE, CURRENT}
+    @Override
+    public String toString() {
+        return identifier + " " + current + " / " + base;
+    }
 
 }
